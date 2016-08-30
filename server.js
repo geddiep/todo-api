@@ -70,7 +70,7 @@ app.delete('/todos/:id', function(req,res){
 	var todoFound = _.findWhere(todos, {id: todoId});
 
 	if(todoFound != undefined){
-		_.without(todos, todoFound);
+		todos = _.without(todos, todoFound);
 		res.json(todoFound);
 	} else{
 		res.status(404).send();	
