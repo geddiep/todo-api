@@ -45,7 +45,7 @@ app.get('/todos/:id', function(req,res){
 	
 });
 
-//post todos
+//POST todos
 app.post('/todos', function(req,res){
 
 	//#### VALIDATION ################
@@ -62,6 +62,23 @@ app.post('/todos', function(req,res){
 	todoNextId++;
 	res.json(body);
 });
+
+
+// DELETE /todos/:id
+app.delete('/todos/:id', function(req,res){
+	var todoId 	= parseInt(req.params.id);
+	var todoFound = _.findWhere(todos, {id: todoId});
+
+	if(todoFound != undefined){
+		_.without(todos, todoFound);
+		res.json(todoFound);
+	} else{
+		res.status(404).send();	
+	}
+});
+
+
+
 
 app.listen(PORT, function(){
 	console.log('Express listening on port ' + PORT + '!');
