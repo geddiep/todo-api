@@ -2,6 +2,9 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var app 	= express();
 var PORT 	= process.env.PORT || 3000;
+var _ = require('underscore');
+
+
 // var todos	= [{
 // 	id: 		1,
 // 	description:'Meet mom for lunch',
@@ -28,20 +31,11 @@ app.get('/', function (req, res){
 app.get('/todos', function(req,res){
 	res.json(todos);
 });
+
 // GET /todos/:id
 app.get('/todos/:id', function(req,res){
-	var todoId 	= req.params.id;
-	var todoFound;
-	//res.send('Asking for todo with id of ' + req.params.id);
-
-	for (var i = 0, len = todos.length; i < len; i++) {
-		var todo = todos[i];
-
-		if(todo.id == todoId){
-			todoFound = todo;
-			continue;
-		}
-	}
+	var todoId 	= parseInt(req.params.id);
+	var todoFound = _.findWhere(todos, {id: todoId});
 
 	if(todoFound != undefined){
 		res.json(todoFound);
@@ -51,16 +45,23 @@ app.get('/todos/:id', function(req,res){
 	
 });
 
-
+//post todos
 app.post('/todos', function(req,res){
-	var body = req.body;
-	body.id = todoNextId;
+
+	//#### VALIDATION ################
+	var body= _.pick(req.body,'description','completed'); //keep only these 2
+	if(	!_.isBoolean(body.completed) || 
+		!_.isString(body.description) || 
+		body.description.trim().length === 0){
+		return res.status(400).send();
+	}
+
+	body.description= body.description.trim(); 	//clean it up
+	body.id 		= todoNextId; 				//set the id
 	todos.push(body);
 	todoNextId++;
 	res.json(body);
 });
-
-
 
 app.listen(PORT, function(){
 	console.log('Express listening on port ' + PORT + '!');
