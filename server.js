@@ -33,7 +33,17 @@ app.get('/', function (req, res){
 
 // GET /todos
 app.get('/todos', function(req,res){
-	res.json(todos);
+	var queryParams = req.query;
+	var filteredTodos = todos;
+
+	if(queryParams.hasOwnProperty('completed')){
+		if(queryParams.completed === 'true')
+			filteredTodos = _.where(filteredTodos, {completed: true});
+		else if(queryParams.completed === 'true')
+			filteredTodos = _.where(filteredTodos, {completed: false});
+	}
+
+	res.json(filteredTodos);
 });
 
 // GET /todos/:id
