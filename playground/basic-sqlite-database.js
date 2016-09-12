@@ -17,7 +17,7 @@ var Todo = sequelize.define('todo',{
 		allowNull: false,
 		defaultValue: false
 	}
-})
+});
 
 //challenge option 1
 // sequelize.sync({
@@ -45,7 +45,6 @@ sequelize.sync({
 	//force: true 
 }).then (function(){
 	console.log('Everything is synced');
-
 
 	//fetch a todo item by id 
 	//if there print toJSON
