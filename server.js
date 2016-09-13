@@ -32,29 +32,54 @@ app.get('/', function(req, res) {
 
 // GET /todos
 app.get('/todos', function(req, res) {
-	var queryParams = req.query;
-	var filteredTodos = todos;
+	var query = req.query;
+	var where = {};
 
-	//completed?
-	if (queryParams.hasOwnProperty('completed')) {
-		if (queryParams.completed === 'true')
-			filteredTodos = _.where(filteredTodos, {
-				completed: true
-			});
-		else if (queryParams.completed === 'false')
-			filteredTodos = _.where(filteredTodos, {
-				completed: false
-			});
-	}
-	//search
-	if (queryParams.hasOwnProperty('search') && queryParams.search.length > 0) {
-		filteredTodos = _.filter(filteredTodos, function(todo) {
-			if (todo.description.toLowerCase().indexOf(queryParams.search.toLowerCase()) > -1)
-				return todo;
-		});
+	//######## second TRY ###################
+	if (query.hasOwnProperty('completed') && query.completed === 'true') {
+		where.completed = true;
+	} else if(query.hasOwnProperty('completed') && query.completed === 'false'){
+		where.completed = false;
 	}
 
-	res.json(filteredTodos);
+	if (query.hasOwnProperty('search') && query.search.length > 0){
+		where.description = {$like: '%'+query.search+'%'};
+	}
+
+	db.todo.findAll({where: where}).then (function(todos){
+		if(!!todos)
+			res.json(todos);
+		else
+			res.status(400).send();
+	}, function(e){
+		res.status(500).send();
+	});
+
+
+	// //############## INITIAL try ##################
+	// var queryParams = req.query;
+	// var filteredTodos = todos;
+
+	// //completed?
+	// if (queryParams.hasOwnProperty('completed')) {
+	// 	if (queryParams.completed === 'true')
+	// 		filteredTodos = _.where(filteredTodos, {
+	// 			completed: true
+	// 		});
+	// 	else if (queryParams.completed === 'false')
+	// 		filteredTodos = _.where(filteredTodos, {
+	// 			completed: false
+	// 		});
+	// }
+	// //search
+	// if (queryParams.hasOwnProperty('search') && queryParams.search.length > 0) {
+	// 	filteredTodos = _.filter(filteredTodos, function(todo) {
+	// 		if (todo.description.toLowerCase().indexOf(queryParams.search.toLowerCase()) > -1)
+	// 			return todo;
+	// 	});
+	// }
+
+	// res.json(filteredTodos);
 });
 
 // GET /todos/:id
