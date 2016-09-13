@@ -60,15 +60,25 @@ app.get('/todos', function(req, res) {
 // GET /todos/:id
 app.get('/todos/:id', function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
-	var todoFound = _.findWhere(todos, {
-		id: todoId
+	
+	db.todo.findById(todoId).then (function (todo){
+		if(!!todo)
+			res.json(todo.toJSON());
+		else
+			res.status(400).send();
+	}, function(e){
+		res.status(500).send();
 	});
 
-	if (todoFound != undefined) {
-		res.json(todoFound);
-	} else {
-		res.status(404).send();
-	}
+	// var todoFound = _.findWhere(todos, {
+	// 	id: todoId
+	// });
+
+	// if (todoFound != undefined) {
+	// 	res.json(todoFound);
+	// } else {
+	// 	res.status(404).send();
+	// }
 });
 
 //POST todos
@@ -76,7 +86,14 @@ app.post('/todos', function(req, res) {
 
 	var body = _.pick(req.body, 'description', 'completed'); //keep only these 2
 
-	//my way
+	//his way
+	db.todo.create(body).then(function(todo){
+		res.json(todo.toJSON());
+	}, function(e){
+		res.status(400).json(e);
+	});
+
+	// //my way
 	// db.todo.create({
 	// 	description: body.description,
 	// 	completed: body.completed
@@ -85,13 +102,6 @@ app.post('/todos', function(req, res) {
 	// }).catch(function(e){
 	// 	return res.status(400).json(e);
 	// });
-
-	//his way
-	db.todo.create(body).then(function(todo){
-		res.json(todo.toJSON());
-	}, function(e){
-		res.status(400).json(e);
-	});
 
 
 	// //#### VALIDATION ################
