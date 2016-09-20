@@ -29,6 +29,7 @@ app.get('/', function(req, res) {
 	res.send('Todo API Root');
 });
 
+//######### TODOS ###########################################
 // GET /todos
 app.get('/todos', function(req, res) {
 	var query = req.query;
@@ -86,7 +87,6 @@ app.post('/todos', function(req, res) {
 	});
 });
 
-
 // DELETE /todos/:id
 app.delete('/todos/:id', function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
@@ -143,6 +143,23 @@ app.put('/todos/:id', function(req, res) {
 	});
 
 });
+
+//#########   USERS #########################################
+//POST users
+app.post('/users', function(req, res) {
+
+	var body = _.pick(req.body, 'email', 'password'); //keep only these 2
+
+	//his way
+	db.user.create(body).then(function(user) {
+		res.json(user.toJSON());
+	}, function(e) {
+		res.status(400).json(e);
+	});
+});
+
+
+
 
 db.sequelize.sync().then(function() {
 	app.listen(PORT, function() {
